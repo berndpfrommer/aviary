@@ -143,6 +143,31 @@ def launch_setup(context, *args, **kwargs):
                 parameters=[make_parameters()],
                 extra_arguments=[{'use_intra_process_comms': True}],
             ),
+            ComposableNode(
+                package='rosbag2_transport',
+                plugin='rosbag2_transport::Recorder',
+                name='recorder',
+                parameters=[
+                    {   'record.topics': make_topics(),
+                        'record.start_paused': True,
+                        'storage.uri': make_name(LaunchConfig('bag_prefix'), context),
+                    }],
+                extra_arguments=[{'use_intra_process_comms': True}]
+            ),
+#            ComposableNode(
+#                package='rosbag2_composable_recorder',
+#                plugin='rosbag2_composable_recorder::ComposableRecorder',
+#                name="recorder",
+#                parameters=[{'topics': make_topics(),
+#                             'storage_id': 'mcap',
+#                             'record_all': False,
+#                             'disable_discovery': False,
+#                             'serialization_format': 'cdr',
+#                             'start_recording_immediately': False,
+#                             'bag_prefix': LaunchConfig('bag_prefix')}],
+#                remappings=[],
+#                extra_arguments=[{'use_intra_process_comms': True}],
+#            )
         ],
         output='screen',
         additional_env={'RCUTILS_CONSOLE_OUTPUT_FORMAT':
