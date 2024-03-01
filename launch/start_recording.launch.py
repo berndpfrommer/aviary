@@ -15,39 +15,38 @@
 #
 #
 
+from datetime import datetime
+
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument as LaunchArg
 from launch.actions import OpaqueFunction
 from launch.substitutions import LaunchConfiguration as LaunchConfig
-from launch.substitutions import PathJoinSubstitution as PJoin
-from launch_ros.actions import Node, LoadComposableNodes, ComposableNodeContainer
-from launch_ros.substitutions import FindPackageShare
-
+from launch_ros.actions import LoadComposableNodes
 from launch_ros.descriptions import ComposableNode
-from launch.actions import SetEnvironmentVariable
-
-from datetime import datetime
 
 camera_list = {
-    "cam0": "18057299",
-    "cam1": "18025945",
-#    "cam2": "17408093",
-#    "cam3": "18288156",
-#    "cam4": "18057298",
-#    "cam5": "18057303",
-   # "cam6": "18057304",   # not working
-#    "cam7": "18025950",
-#    "cam8": "23199575",
+    'cam0': '18057299',
+    'cam1': '18025945',
+    #    "cam2": "17408093",
+    #    "cam3": "18288156",
+    #    "cam4": "18057298",
+    #    "cam5": "18057303",
+    # "cam6": "18057304",   # not working
+    #    "cam7": "18025950",
+    #    "cam8": "23199575",
 }
 
+
 def make_topics():
-    topics = [f"/cam_sync/{c}/image_raw/ffmpeg" for c in camera_list]
-    topics += [f"/cam_sync/{c}/camera_info" for c in camera_list]
+    topics = [f'/cam_sync/{c}/image_raw/ffmpeg' for c in camera_list]
+    topics += [f'/cam_sync/{c}/camera_info' for c in camera_list]
     return topics
+
 
 def make_name(prefix, context):
     now = datetime.now()
     return prefix.perform(context) + now.strftime('%Y-%m-%d-%H-%M-%S')
+
 
 def launch_setup(context, *args, **kwargs):
     launch_action = LoadComposableNodes(
@@ -58,11 +57,13 @@ def launch_setup(context, *args, **kwargs):
                 plugin='rosbag2_transport::Recorder',
                 name='recorder',
                 parameters=[
-                    {   'record.topics': make_topics(),
+                    {
+                        'record.topics': make_topics(),
                         'record.start_paused': False,
                         'storage.uri': make_name(LaunchConfig('bag_prefix'), context),
-                    }],
-                extra_arguments=[{'use_intra_process_comms': True}]
+                    }
+                ],
+                extra_arguments=[{'use_intra_process_comms': True}],
             ),
         ],
     )
@@ -74,12 +75,11 @@ def generate_launch_description():
     return LaunchDescription(
         [
             LaunchArg(
-                "container_name",
-                default_value=["cam_sync_container"],
-                description="name of cam_sync container node",
+                'container_name',
+                default_value=['cam_sync_container'],
+                description='name of cam_sync container node',
             ),
-            LaunchArg('bag_prefix', default_value=['rosbag2_'],
-                      description='prefix of rosbag'),
+            LaunchArg('bag_prefix', default_value=['rosbag2_'], description='prefix of rosbag'),
             OpaqueFunction(function=launch_setup),
         ]
     )

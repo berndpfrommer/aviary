@@ -16,13 +16,16 @@
 #
 
 import subprocess
+
+
 import rclpy
 
 
 def main(args=None):
     rclpy.init(args=args)
-    output = subprocess.Popen(["ros2", "launch", "aviary", "start_recording.launch.py"])
+    output = subprocess.Popen(['ros2', 'launch', 'aviary', 'start_recording.launch.py'])
     output.communicate()  # Will block until launch complete done
+
 
 if __name__ == '__main__':
     main()

@@ -16,25 +16,29 @@
 #
 
 import subprocess
+
+
 import rclpy
 
 
 def main(args=None):
     rclpy.init(args=args)
-    cname = "/cam_sync_container"
-    output = subprocess.run(["ros2", "component", "list", cname], stdout=subprocess.PIPE)
+    cname = '/cam_sync_container'
+    output = subprocess.run(['ros2', 'component', 'list', cname], stdout=subprocess.PIPE)
     lines = output.stdout.decode('utf-8').splitlines()
     stopped = False
     for line in lines:
         a = line.split()
         if a[1] == '/recorder':
             output = subprocess.run(
-                ["ros2", "component", "unload", cname, f"{a[0]}"], stdout=subprocess.PIPE)
+                ['ros2', 'component', 'unload', cname, f'{a[0]}'], stdout=subprocess.PIPE
+            )
             stopped = True
     if stopped:
-        print("recording stopped!")
+        print('recording stopped!')
     else:
-        print("WARNING: recording not stopped because none was running!")
+        print('WARNING: recording not stopped because none was running!')
+
 
 if __name__ == '__main__':
     main()

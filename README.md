@@ -10,7 +10,7 @@ Should run on ROS2 distribution Humble and later.
 
 Set the following shell variables:
 ```bash
-repo=event_camera_py
+repo=aviary
 url=https://github.com/ros-event-camera/${repo}.git
 ```
 and follow the [instructions here](https://github.com/ros-misc-utilities/.github/blob/master/docs/build_ros_repository.md)
