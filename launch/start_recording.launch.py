@@ -25,27 +25,28 @@ from launch_ros.actions import LoadComposableNodes
 from launch_ros.descriptions import ComposableNode
 
 camera_list = {
-    'cam0': '18057299',
-    'cam1': '18025945',
-    #    "cam2": "17408093",
-    #    "cam3": "18288156",
-    #    "cam4": "18057298",
-    #    "cam5": "18057303",
-    # "cam6": "18057304",   # not working
-    #    "cam7": "18025950",
-    #    "cam8": "23199575",
+    "cam0": "18057299",
+    "cam1": "18025945",
+    "cam2": "17408093",
+    "cam3": "18288156",
+    "cam4": "18057298",
+    "cam5": "18057303",
+    "cam6": "18057304",   # not working
+    "cam7": "18025950",
+    "cam8": "23199575",
 }
 
 
 def make_topics():
-    topics = [f'/cam_sync/{c}/image_raw/ffmpeg' for c in camera_list]
-    topics += [f'/cam_sync/{c}/camera_info' for c in camera_list]
+    topics = [f"/cam_sync/{c}/image_raw/ffmpeg" for c in camera_list]
+    topics += [f"/cam_sync/{c}/camera_info" for c in camera_list]
+    topics += [f"/audio/audio_stamped"]
     return topics
 
 
 def make_name(prefix, context):
     now = datetime.now()
-    return prefix.perform(context) + now.strftime('%Y-%m-%d-%H-%M-%S')
+    return prefix.perform(context) + now.strftime('%Y_%m_%d-%H_%M_%S')
 
 
 def launch_setup(context, *args, **kwargs):
