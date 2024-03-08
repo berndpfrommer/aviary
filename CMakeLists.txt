@@ -18,19 +18,38 @@ project(aviary)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_ros REQUIRED)
+find_package(ament_cmake_auto REQUIRED)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc calib3d)
 
+set(ament_dependencies
+  "rclcpp"
+  "rclcpp_components"
+  "rosbag2_cpp"
+  "cv_bridge"
+  "audio_common_msgs"
+  "sensor_msgs")
 
-set(ROS2_DEPENDENCIES
-  "rosbag2_transport"
-)
-
-foreach(pkg ${ROS2_DEPENDENCIES})
+foreach(pkg ${ament_dependencies})
   find_package(${pkg} REQUIRED)
 endforeach()
+
+
+#
+# -------- bag_to_wave
+#
+add_executable(bag_to_wave  src/bag_to_wave.cpp)
+ament_target_dependencies(bag_to_wave ${ament_dependencies})
+# target_link_libraries(bag_to_wave opencv_calib3d)
+target_compile_features(bag_to_wave PRIVATE cxx_std_17)
 
 install(PROGRAMS
   src/start_recording.py
   src/stop_recording.py
+  DESTINATION lib/${PROJECT_NAME}/)
+
+install(TARGETS
+  bag_to_wave
   DESTINATION lib/${PROJECT_NAME}/)
 
 install(DIRECTORY

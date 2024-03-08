@@ -15,8 +15,6 @@
 #
 #
 
-from datetime import datetime
-
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument as LaunchArg
 from launch.actions import OpaqueFunction
@@ -27,15 +25,15 @@ from launch_ros.descriptions import ComposableNode
 from launch_ros.substitutions import FindPackageShare
 
 camera_list = {
-    "cam0": "18057299",
-    "cam1": "18025945",
-    "cam2": "17408093",
-    "cam3": "18288156",
-    "cam4": "18057298",
-    "cam5": "18057303",
+    'cam0': '18057299',
+    'cam1': '18025945',
+    'cam2': '17408093',
+    'cam3': '18288156',
+    'cam4': '18057298',
+    'cam5': '18057303',
     # "cam6": "18057304",   # not working
-    "cam7": "18025950",
-    "cam8": "23199575",
+    'cam7': '18025950',
+    'cam8': '23199575',
 }
 
 camera_list_all = {
@@ -147,22 +145,9 @@ def generate_launch_description():
     return LaunchDescription(
         [
             LaunchArg(
-<<<<<<< variant A
-                'driver_name',
-                default_value=['cam_sync'],
-                description='name of driver node',
-            ),
-            LaunchArg(
                 'camera_parameter_directory',
                 default_value=PJoin([FindPackageShare('spinnaker_camera_driver'), 'config']),
                 description='root directory for camera parameter definitions',
->>>>>>> variant B
-                "camera_parameter_directory",
-                default_value=PJoin(
-                    [FindPackageShare("spinnaker_camera_driver"), "config"]
-                ),
-                description="root directory for camera parameter definitions",
-======= end
             ),
             LaunchArg('bag_prefix', default_value=['rosbag2_'], description='prefix of rosbag'),
             OpaqueFunction(function=launch_setup),

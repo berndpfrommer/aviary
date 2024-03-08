@@ -14,29 +14,31 @@
 # limitations under the License.
 #
 #
-from launch.actions import DeclareLaunchArgument
 from launch import LaunchDescription
-from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    _audio_capture_node = Node(
+    audio_capture_node = Node(
         package='audio_capture',
         name='audio',
         executable='audio_capture_node',
-        namespace="",
-        parameters=[{
-            'device': "hw:LP32,0",
-            'channels': 24,
-            'depth': 24,
-            'sample_rate': 48000,
-            'sample_format': 'S24LE',
-            'coding_format': "wave",
-        }],
+        namespace='',
+        parameters=[
+            {
+                'device': 'hw:LP32,0',
+                'channels': 24,
+                'depth': 24,
+                'sample_rate': 48000,
+                'sample_format': 'S24LE',
+                'coding_format': 'wave',
+            }
+        ],
         remappings=[],
     )
 
-    return LaunchDescription([
-        _audio_capture_node,
-    ])
+    return LaunchDescription(
+        [
+            audio_capture_node,
+        ]
+    )
