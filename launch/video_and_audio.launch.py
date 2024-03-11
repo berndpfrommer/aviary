@@ -51,10 +51,10 @@ camera_list_all = {
 exposure_controller_parameters = {
     'type': 'individual',
     'brightness_target': 120,
-    'brightness_tolerance': 5,
+    'brightness_tolerance': 20,
     # watch that max_exposure_time is short enough
     # to support the trigger frame rate!
-    'max_exposure_time': 20000,  # usec
+    'max_exposure_time': 15000,  # usec
     'min_exposure_time': 5000,  # usec
     'max_gain': 29.9,
     'gain_priority': False,
