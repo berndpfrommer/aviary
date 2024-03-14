@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 
 pid=`ps -eaf | grep -i '__node:=cam_sync_container' | grep -v grep | awk '{ print $2}'`
 if [ -z "${pid}" ]; then
