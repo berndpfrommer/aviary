@@ -27,7 +27,6 @@
 #include <rclcpp/serialized_message.hpp>
 #include <rosbag2_cpp/reader.hpp>
 #include <rosbag2_cpp/readers/sequential_reader.hpp>
-#include <sensor_msgs/msg/image.hpp>
 #include <sstream>
 
 #include "logging.hpp"

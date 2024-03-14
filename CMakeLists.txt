@@ -20,15 +20,12 @@ project(aviary)
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 find_package(ament_cmake_auto REQUIRED)
-find_package(OpenCV REQUIRED COMPONENTS core imgproc calib3d)
 
 set(ament_dependencies
   "rclcpp"
   "rclcpp_components"
   "rosbag2_cpp"
-  "cv_bridge"
-  "audio_common_msgs"
-  "sensor_msgs")
+  "audio_common_msgs")
 
 foreach(pkg ${ament_dependencies})
   find_package(${pkg} REQUIRED)

@@ -2,4 +2,5 @@ repositories:
   audio_common:
     type: git
     url: https://github.com/berndpfrommer/audio_common.git
-    version: cleaned_audio_capture
+    version: aviary
+
