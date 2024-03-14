@@ -18,11 +18,13 @@
   <build_depend>libgstreamer1.0-dev</build_depend>
   <build_depend>libgstreamer-plugins-base1.0-dev</build_depend>
 
+
   <depend>ros_environment</depend>
   <depend>rclcpp_components</depend>
   <depend>rclcpp</depend>
   <depend>rosbag2_cpp</depend>
-  
+  <depend>audio_common_msgs</depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>
