@@ -1,6 +1,6 @@
 repositories:
-  audio_common:
+  audio_common_msgs:
     type: git
-    url: https://github.com/berndpfrommer/audio_common.git
-    version: aviary
+    url: https://github.com/berndpfrommer/audio_common_msgs.git
+    version: master
 
