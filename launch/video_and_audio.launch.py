@@ -165,7 +165,5 @@ def generate_launch_description():
                 default_value=PJoin([FindPackageShare('spinnaker_camera_driver'), 'config']),
                 description='root directory for camera parameter definitions',
             ),
-            LaunchArg('bag_prefix', default_value=['rosbag2_'], description='prefix of rosbag'),
-            OpaqueFunction(function=launch_setup),
         ]
     )

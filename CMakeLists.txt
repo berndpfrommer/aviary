@@ -40,7 +40,7 @@ endforeach()
 #
 add_executable(bag_to_wave  src/bag_to_wave.cpp)
 ament_target_dependencies(bag_to_wave ${ament_dependencies})
-# target_link_libraries(bag_to_wave opencv_calib3d)
+target_include_directories(bag_to_wave PRIVATE include)
 target_compile_features(bag_to_wave PRIVATE cxx_std_17)
 
 install(PROGRAMS

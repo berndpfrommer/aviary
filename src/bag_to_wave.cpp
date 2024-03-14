@@ -15,11 +15,12 @@
 
 #include <unistd.h>
 
-#include "logging.hpp"
+#include <audio_common_msgs/msg/audio_data_stamped.hpp>
+#include <aviary/bag_processor.hpp>
+#include <aviary/message_processor.hpp>
 #include <chrono>
 #include <filesystem>
 #include <fstream>
-#include <sstream>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/serialization.hpp>
@@ -27,21 +28,21 @@
 #include <rosbag2_cpp/reader.hpp>
 #include <rosbag2_cpp/readers/sequential_reader.hpp>
 #include <sensor_msgs/msg/image.hpp>
+#include <sstream>
 
-#include <audio_common_msgs/msg/audio_data_stamped.hpp>
+#include "logging.hpp"
 
 void usage()
 {
   std::cout << "usage:" << std::endl;
   std::cout << "bag_to_wave -b input_bag [-t topic] [-o out_file] "
             << "[-T timestamp_file] [-s start_time] [-e end_time] "
-            << "[-E encoding] [-c channels] [-r rate]"
-            << std::endl;
+            << "[-E encoding] [-c channels] [-r rate]" << std::endl;
 }
 
 using audio_common_msgs::msg::AudioDataStamped;
-using Path = std::filesystem::path;
 using rclcpp::Time;
+using bag_time_t = rcutils_time_point_value_t;
 
 static rclcpp::Logger get_logger()
 {
@@ -68,45 +69,33 @@ static void convertToWavpack(const std::string &raw, const std::string &wavpak,
       }
 }
 
-
-
-void processBag(const std::string &out_file, const std::string &bag,
-                const std::string &topic, const std::string &time_stamp_file,
-                double start_time, double end_time)
+class FileWriter : public aviary::MessageProcessor<AudioDataStamped>
 {
-  LOG_INFO("opening bag: " << bag << " topic: " << topic);
-  rosbag2_cpp::Reader reader;
-  reader.open(bag);
-  rclcpp::Serialization<AudioDataStamped> serialization;
-  std::ofstream ts_file(time_stamp_file);
-  std::fstream raw_file;
-  raw_file.open(out_file, std::ios::app | std::ios::binary);
-  LOG_INFO("opening bag done.");
-
-  size_t sample_number{0};
-  size_t packet_number{0};
-  while (reader.has_next())
+public:
+  FileWriter(const std::string & raw_file, const std::string & ts_file)
   {
-    auto msg = reader.read_next();
-    if (!msg || topic != msg->topic_name)
-    {
-      continue;
-    }
-    rclcpp::SerializedMessage serialized_msg(*msg->serialized_data);
-    AudioDataStamped::SharedPtr m(new AudioDataStamped());
-    serialization.deserialize_message(&serialized_msg, m.get());
-    raw_file.write(reinterpret_cast<char*>(m->audio.data.data()), m->audio.data.size());
-    ts_file << packet_number << " " << Time(m->header.stamp).nanoseconds()
-            << " " << Time(msg->time_stamp).nanoseconds() << std::endl;
-    
-    packet_number++;
-    sample_number += 1;
+    std::cout << "writing to raw file: " << raw_file << std::endl;
+    raw_file_ = std::ofstream(raw_file, std::ios::out | std::ios::binary);
+    ts_file_.open(ts_file);
   }
-}
+
+  void process(uint64_t t, const AudioDataStamped::ConstSharedPtr & m) final
+  {
+    const auto t_header = Time(m->header.stamp).nanoseconds();
+    raw_file_.write(reinterpret_cast<const char *>(m->audio.data.data()), m->audio.data.size());
+    ts_file_ << packet_number_++ << " "
+             << " " << t_header << " " << t << std::endl;
+  }
+
+private:
+  std::ofstream raw_file_;
+  std::ofstream ts_file_;
+  size_t packet_number_{0};
+};
 
 #define USE_WAVEPAK
 
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
   int opt;
   double rate(48000);
@@ -118,73 +107,79 @@ int main(int argc, char **argv)
 #else
   std::string out_enc = "pcm_" + enc;
   std::string out_file = "audio.wav";
-#endif  
+#endif
   std::string topic = "/audio/audio_stamped";
   std::string time_stamp_file = "timestamps.txt";
 
-  double start_time(0);
-  double end_time(std::numeric_limits<double>::max());
+  bag_time_t start_time = std::numeric_limits<bag_time_t>::min();
+  bag_time_t end_time = std::numeric_limits<bag_time_t>::max();
   int channels(24);
-  while ((opt = getopt(argc, argv, "b:c:e:E:o:O::s:t:T:h")) != -1)
-  {
-    switch (opt)
-    {
-    case 'b':
-      bag = optarg;
-      break;
-    case 'c':
-      channels = atoi(optarg);
-      break;
-    case 'e':
-      end_time = atof(optarg);
-      break;
-    case 'E':
-      enc = optarg;
-      break;
-    case 'o':
-      out_file = atof(optarg);
-      break;
-    case 'O':
-      out_enc = optarg;
-      break;
-    case 's':
-      start_time = atof(optarg);
-      break;
-    case 'r':
-      rate = atof(optarg);
-      break;
-    case 't':
-      topic = optarg;
-      break;
-    case 'T':
-      time_stamp_file = optarg;
-      break;
-    case 'h':
-      usage();
-      return (-1);
-      break;
-    default:
-      std::cout << "unknown option: " << opt << std::endl;
-      usage();
-      return (-1);
-      break;
+  while ((opt = getopt(argc, argv, "b:c:e:E:o:O::s:t:T:h")) != -1) {
+    switch (opt) {
+      case 'b':
+        bag = optarg;
+        break;
+      case 'c':
+        channels = atoi(optarg);
+        break;
+      case 'e':
+        end_time = static_cast<bag_time_t>(atof(optarg) * 1e9);
+        if (end_time < 0) {
+          std::cout << "end time out of range, must be in seconds since start of epoch"
+                    << std::endl;
+          usage();
+          return (-1);
+        }
+        break;
+      case 'E':
+        enc = optarg;
+        break;
+      case 'o':
+        out_file = atof(optarg);
+        break;
+      case 'O':
+        out_enc = optarg;
+        break;
+      case 's':
+        start_time = static_cast<bag_time_t>(atof(optarg) * 1e9);
+        if (start_time < 0) {
+          std::cout << "start time out of range, must be in seconds since start of epoch"
+                    << std::endl;
+          usage();
+          return (-1);
+        }
+        break;
+      case 'r':
+        rate = atof(optarg);
+        break;
+      case 't':
+        topic = optarg;
+        break;
+      case 'T':
+        time_stamp_file = optarg;
+        break;
+      case 'h':
+        usage();
+        return (-1);
+        break;
+      default:
+        std::cout << "unknown option: " << opt << std::endl;
+        usage();
+        return (-1);
+        break;
     }
   }
-  if (bag.empty())
-  {
+  if (bag.empty()) {
     std::cout << "missing bag file argument!" << std::endl;
     usage();
     return (-1);
   }
 
-  const auto start = std::chrono::high_resolution_clock::now();
   const std::string raw_file = out_file + ".tmp";
-  processBag(raw_file, bag, topic, time_stamp_file, start_time, end_time);
+  const std::string topic_type = "audio_common_msgs/msg/AudioDataStamped";
+  aviary::BagProcessor<AudioDataStamped> bproc(bag, topic, topic_type, start_time, end_time);
+  FileWriter fw(raw_file, time_stamp_file);
+  bproc.process(&fw);
   convertToWavpack(raw_file, out_file, enc, out_enc, rate, channels);
-  const auto stop = std::chrono::high_resolution_clock::now();
-  auto total_duration =
-      std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-  std::cout << "total time for processing: " << total_duration.count() * 1e-6
-            << std::endl;
   return (0);
 }
