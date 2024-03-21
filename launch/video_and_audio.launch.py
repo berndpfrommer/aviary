@@ -17,6 +17,7 @@
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument as LaunchArg
+from launch.actions import OpaqueFunction
 from launch.substitutions import LaunchConfiguration as LaunchConfig
 from launch.substitutions import PathJoinSubstitution as PJoin
 from launch_ros.actions import ComposableNodeContainer
@@ -163,5 +164,6 @@ def generate_launch_description():
                 default_value=PJoin([FindPackageShare('spinnaker_camera_driver'), 'config']),
                 description='root directory for camera parameter definitions',
             ),
+            OpaqueFunction(function=launch_setup),
         ]
     )
