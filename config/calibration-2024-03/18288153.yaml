@@ -1,0 +1,26 @@
+image_width: 1920
+image_height: 1200
+camera_name: cam9
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [2129.0822 ,    0.     ,  959.51466,
+            0.     , 2124.73314,  552.57881,
+            0.     ,    0.     ,    1.     ]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.227660, 0.225724, -0.001677, -0.000248, 0.000000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1., 0., 0.,
+         0., 1., 0.,
+         0., 0., 1.]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [2044.2373 ,    0.     ,  958.61317,    0.     ,
+            0.     , 2085.17407,  549.65796,    0.     ,
+            0.     ,    0.     ,    1.     ,    0.     ]

@@ -31,9 +31,10 @@ camera_list = {
     'cam3': '18288156',
     'cam4': '18057298',
     'cam5': '18057303',
-    # "cam6": "18057304",   # not working
+    'cam6': '18057304',
     'cam7': '18025950',
     'cam8': '23199575',
+    'cam9': '18288153',
 }
 
 camera_list_all = {
@@ -43,9 +44,10 @@ camera_list_all = {
     'cam3': '18288156',
     'cam4': '18057298',
     'cam5': '18057303',
-    # "cam6": "18057304",   # not working
+    'cam6': '18057304',
     'cam7': '18025950',
     'cam8': '23199575',
+    'cam9': '18288153',
 }
 
 exposure_controller_parameters = {
@@ -79,6 +81,7 @@ cam_parameters = {
     'chunk_mode_active': True,
     'chunk_selector_frame_id': 'FrameID',
     'chunk_enable_frame_id': True,
+    'balance_white_auto': 'Continuous',
     # exposure time and gain chunks are required for exposure control
     'chunk_selector_exposure_time': 'ExposureTime',
     'chunk_enable_exposure_time': True,
@@ -90,9 +93,10 @@ cam_parameters = {
 }
 
 
-def make_parameters():
+def make_parameters(context):
     """Launch synchronized camera driver node."""
     pd = LaunchConfig('camera_parameter_directory')
+    calib_url = "file://" + LaunchConfig('calibration_directory').perform(context) + "/"
 
     exp_ctrl_names = [cam + '.exposure_controller' for cam in camera_list.keys()]
     driver_parameters = {
@@ -111,6 +115,8 @@ def make_parameters():
     for cam, serial in camera_list.items():
         cam_params = {cam + '.' + k: v for k, v in cam_parameters.items()}
         cam_params[cam + '.serial_number'] = serial
+        cam_params[cam + '.camerainfo_url'] = calib_url + serial + ".yaml"
+        cam_params[cam + '.frame_id'] = cam
         driver_parameters.update(cam_params)  # insert into main parameter list
         # link the camera to its exposure controller
         driver_parameters.update({cam + '.exposure_controller_name': cam + '.exposure_controller'})
@@ -128,7 +134,7 @@ def launch_setup(context, *args, **kwargs):
                 package='spinnaker_synchronized_camera_driver',
                 plugin='spinnaker_synchronized_camera_driver::SynchronizedCameraDriver',
                 name='cam_sync',
-                parameters=[make_parameters()],
+                parameters=[make_parameters(context)],
                 extra_arguments=[{'use_intra_process_comms': True}],
             ),
             ComposableNode(
@@ -163,6 +169,11 @@ def generate_launch_description():
                 'camera_parameter_directory',
                 default_value=PJoin([FindPackageShare('spinnaker_camera_driver'), 'config']),
                 description='root directory for camera parameter definitions',
+            ),
+            LaunchArg(
+                'calibration_directory',
+                default_value=PJoin([FindPackageShare('aviary'), 'config/calibration-2024-03']),
+                description='root directory for camera calibration files',
             ),
             OpaqueFunction(function=launch_setup),
         ]

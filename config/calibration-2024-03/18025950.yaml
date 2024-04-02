@@ -1,0 +1,26 @@
+image_width: 1920
+image_height: 1200
+camera_name: cam7
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [2136.03012,    0.     ,  932.2488 ,
+            0.     , 2133.0272 ,  567.21127,
+            0.     ,    0.     ,    1.     ]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.225215, 0.199756, -0.005182, -0.001592, 0.000000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1., 0., 0.,
+         0., 1., 0.,
+         0., 0., 1.]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [2049.92969,    0.     ,  927.53457,    0.     ,
+            0.     , 2093.08008,  562.85576,    0.     ,
+            0.     ,    0.     ,    1.     ,    0.     ]

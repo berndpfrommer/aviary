@@ -1,0 +1,26 @@
+image_width: 1920
+image_height: 1200
+camera_name: cam8
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [2140.78323,    0.     ,  918.32387,
+            0.     , 2138.30177,  609.08275,
+            0.     ,    0.     ,    1.     ]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.193514, 0.096397, 0.000338, -0.002711, 0.000000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1., 0., 0.,
+         0., 1., 0.,
+         0., 0., 1.]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [2058.13794,    0.     ,  910.744  ,    0.     ,
+            0.     , 2103.88232,  609.03098,    0.     ,
+            0.     ,    0.     ,    1.     ,    0.     ]

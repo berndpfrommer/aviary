@@ -31,9 +31,10 @@ camera_list = {
     'cam3': '18288156',
     'cam4': '18057298',
     'cam5': '18057303',
-    'cam6': '18057304',  # not working
+    'cam6': '18057304',
     'cam7': '18025950',
     'cam8': '23199575',
+    'cam9': '18288153',
 }
 
 
@@ -80,7 +81,7 @@ def generate_launch_description():
                 default_value=['cam_sync_container'],
                 description='name of cam_sync container node',
             ),
-            LaunchArg('bag_prefix', default_value=['rosbag2_'], description='prefix of rosbag'),
+            LaunchArg('bag_prefix', default_value=['/data/recordings/rosbag2_'], description='prefix of rosbag'),
             OpaqueFunction(function=launch_setup),
         ]
     )

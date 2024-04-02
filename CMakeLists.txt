@@ -54,6 +54,10 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}/
   FILES_MATCHING PATTERN "*.py")
 
+install(DIRECTORY
+  config
+  DESTINATION share/${PROJECT_NAME}/)
+
 if(BUILD_TESTING)
   find_package(ament_cmake REQUIRED)
   find_package(ament_cmake_copyright REQUIRED)
