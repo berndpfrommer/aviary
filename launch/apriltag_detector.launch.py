@@ -21,7 +21,7 @@ from launch.actions import OpaqueFunction
 from launch.substitutions import LaunchConfiguration as LaunchConfig
 from launch_ros.actions import ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
-from launch_ros.substitutions import FindPackageShare
+
 
 def launch_setup(context, *args, **kwargs):
     container = ComposableNodeContainer(
@@ -35,15 +35,21 @@ def launch_setup(context, *args, **kwargs):
                 plugin='apriltag_ros::ApriltagDetectorComponent',
                 name='detector',
                 namespace=LaunchConfig('camera'),
-                parameters=[{'tag_family': 0,   # 36h11
-                             'detector': 0,
-                             'black_border_width': 1,
-                             'decimate': 0}],
-                remappings=[('image', 'image_raw'),],
+                parameters=[
+                    {
+                        'tag_family': 0,  # 36h11
+                        'detector': 0,
+                        'black_border_width': 1,
+                        'decimate': 0,
+                    }
+                ],
+                remappings=[
+                    ('image', 'image_raw'),
+                ],
                 extra_arguments=[{'use_intra_process_comms': True}],
             ),
         ],
-        output='screen'
+        output='screen',
     )  # end of container
     return [container]
 

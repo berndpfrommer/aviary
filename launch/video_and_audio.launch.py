@@ -96,7 +96,7 @@ cam_parameters = {
 def make_parameters(context):
     """Launch synchronized camera driver node."""
     pd = LaunchConfig('camera_parameter_directory')
-    calib_url = "file://" + LaunchConfig('calibration_directory').perform(context) + "/"
+    calib_url = 'file://' + LaunchConfig('calibration_directory').perform(context) + '/'
 
     exp_ctrl_names = [cam + '.exposure_controller' for cam in camera_list.keys()]
     driver_parameters = {
@@ -115,7 +115,7 @@ def make_parameters(context):
     for cam, serial in camera_list.items():
         cam_params = {cam + '.' + k: v for k, v in cam_parameters.items()}
         cam_params[cam + '.serial_number'] = serial
-        cam_params[cam + '.camerainfo_url'] = calib_url + serial + ".yaml"
+        cam_params[cam + '.camerainfo_url'] = calib_url + serial + '.yaml'
         cam_params[cam + '.frame_id'] = cam
         driver_parameters.update(cam_params)  # insert into main parameter list
         # link the camera to its exposure controller

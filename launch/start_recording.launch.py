@@ -81,7 +81,11 @@ def generate_launch_description():
                 default_value=['cam_sync_container'],
                 description='name of cam_sync container node',
             ),
-            LaunchArg('bag_prefix', default_value=['/data/recordings/rosbag2_'], description='prefix of rosbag'),
+            LaunchArg(
+                'bag_prefix',
+                default_value=['/data/recordings/rosbag2_'],
+                description='prefix of rosbag',
+            ),
             OpaqueFunction(function=launch_setup),
         ]
     )

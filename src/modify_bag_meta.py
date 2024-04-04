@@ -15,30 +15,30 @@
 # limitations under the License.
 #
 
-import re
 import argparse
+import re
 import subprocess
 
 
 def modify_bag(input_file):
     in_section = False
-    version_pattern = re.compile('\ \ version\:\ ')
-    version_pattern_5 = re.compile('\ \ version\:\ 5')
-    start_pattern = re.compile('.*offered\_qos\_profiles\:.*')
-    end_pattern = re.compile('.*avoid\_ros\_namespace\_conventions\:\ false')
-    backup_file = input_file + "/metadata.yaml.orig"
-    modified_file = input_file + "/metadata.yaml.mod"
-    input_file += "/metadata.yaml"
+    version_pattern = re.compile('  version: ')
+    version_pattern_5 = re.compile('  version: 5')
+    start_pattern = re.compile('.*offered_qos_profiles:.*')
+    end_pattern = re.compile('.*avoid_ros_namespace_conventions: false')
+    backup_file = input_file + '/metadata.yaml.orig'
+    modified_file = input_file + '/metadata.yaml.mod'
+    input_file += '/metadata.yaml'
     with open(input_file) as in_file:
-        with open(modified_file, "w") as mod_file:
+        with open(modified_file, 'w') as mod_file:
             for line in in_file:
                 if version_pattern.match(line):
                     if version_pattern_5.match(line):
                         raise Exception('bag is already version 5!')
-                    mod_file.write(re.sub(r"version\:.*", "version: 5", line))
+                    mod_file.write(re.sub(r'version\:.*', 'version: 5', line))
                     print('original bag version: ', line.rstrip(), ' converted to 5')
                 elif start_pattern.match(line):
-                    mod_file.write(line.rstrip() + " \"\"\n")
+                    mod_file.write(line.rstrip() + ' ""\n')
                     in_section = True
                 else:
                     if not in_section:
@@ -52,8 +52,7 @@ def modify_bag(input_file):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='modify bag metadata to version 5.')
-    parser.add_argument('--bag', '-b', help='name of bag directory',
-                        default=None, required=True)
+    parser.add_argument('--bag', '-b', help='name of bag directory', default=None, required=True)
 
     args = parser.parse_args()
 
