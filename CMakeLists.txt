@@ -43,6 +43,7 @@ target_compile_features(bag_to_wave PRIVATE cxx_std_17)
 install(PROGRAMS
   src/start_recording.py
   src/stop_recording.py
+  src/modify_bag_meta.py
   DESTINATION lib/${PROJECT_NAME}/)
 
 install(TARGETS

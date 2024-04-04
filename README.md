@@ -56,6 +56,18 @@ Example usage:
 ros2 run aviary bag_to_wave  -b /data/recordings/rosbag2_2024_03_14-08_55_15
 ```
 
+## Notes on bag incompatibility:
+
+The bag recording requires a very latest implementation of the rosbag
+recording node, which only is available on ROS2 versions greater than
+Iron. Alas, the bag format has changed after ROS2 Iron, so to be able
+to process the bags under ROS2 iron, they must be converted to the
+older format like so:
+
+```
+ros2 run aviary modify_bag_meta.py -b <path_to_bag_directory>
+```
+
 ## License
 
 This software is issued under the Apache License Version 2.0.
