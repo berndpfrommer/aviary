@@ -67,6 +67,10 @@ cam_parameters = {
     'quiet': True,
     'buffer_queue_size': 1,
     'compute_brightness': True,
+    # 'user_set_default': 'UserSet1',   # for some reason the user set stuff screws up ALL cameras!
+    'default_user_set': 'UserSet1',   # Some needed firmware reinstall!
+    'user_set_selector': 'UserSet1',    # load UserSet1 at startup (Default somehow doesn't)!
+    'user_set_load': 'Yes',  # any string will do to execute the "load" operation
     'exposure_auto': 'Off',
     'exposure_time': 10000,  # not used under auto exposure
     'gain_auto': 'Off',
