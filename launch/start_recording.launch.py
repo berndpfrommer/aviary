@@ -42,6 +42,7 @@ def make_topics():
     topics = [f'/cam_sync/{c}/image_raw/ffmpeg' for c in camera_list]
     topics += [f'/cam_sync/{c}/camera_info' for c in camera_list]
     topics += ['/audio/audio_stamped']
+    topics += ['/rfid_reader/inventory', '/rfid_reader/statistics']
     return topics
 
 

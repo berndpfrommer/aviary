@@ -51,7 +51,7 @@ camera_list_all = {
 }
 
 exposure_controller_parameters = {
-    'type': 'individual',
+    'type': 'master',
     'brightness_target': 120,
     'brightness_tolerance': 20,
     # watch that max_exposure_time is short enough

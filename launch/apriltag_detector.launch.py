@@ -15,7 +15,7 @@
 #
 #
 
-from launch import LaunchDescription
+import launch
 from launch.actions import DeclareLaunchArgument as LaunchArg
 from launch.actions import OpaqueFunction
 from launch.substitutions import LaunchConfiguration as LaunchConfig
@@ -24,43 +24,83 @@ from launch_ros.descriptions import ComposableNode
 
 
 def launch_setup(context, *args, **kwargs):
+    """Create composable node."""
+    trans = LaunchConfig('image_transport').perform(context)
+    trans_suffix = '' if trans == 'raw' else '/' + trans
+    img_src = 'image' + trans_suffix
+    img_trg = LaunchConfig('image').perform(context) + trans_suffix
+    det_type = LaunchConfig('type').perform(context)
+    pkg = 'apriltag_detector_' + det_type
     container = ComposableNodeContainer(
-        name='detector_container',
-        namespace=LaunchConfig('camera'),
+        name='apriltag_detector_container',
+        namespace='',
         package='rclcpp_components',
         executable='component_container',
         composable_node_descriptions=[
             ComposableNode(
-                package='apriltag_ros',
-                plugin='apriltag_ros::ApriltagDetectorComponent',
-                name='detector',
+                package=pkg,
+                plugin=pkg + '::Component',
                 namespace=LaunchConfig('camera'),
                 parameters=[
                     {
-                        'tag_family': 0,  # 36h11
-                        'detector': 0,
-                        'black_border_width': 1,
-                        'decimate': 0,
+                        'black_border_width': LaunchConfig('black_border_width'),
+                        'blur': LaunchConfig('blur'),
+                        'decimate_factor': LaunchConfig('decimate_factor'),
+                        'image_transport': trans,
+                        'max_allowed_hamming_distance': LaunchConfig(
+                            'max_allowed_hamming_distance'
+                        ),
+                        'num_threads': LaunchConfig('num_threads'),
+                        'tag_family': LaunchConfig('tag_family'),
                     }
                 ],
-                remappings=[
-                    ('image', 'image_raw'),
-                ],
+                remappings=[(img_src, img_trg), ('tags', LaunchConfig('tags'))],
+                extra_arguments=[{'use_intra_process_comms': True}],
+            ),
+            ComposableNode(
+                package='apriltag_draw',
+                plugin='apriltag_draw::ApriltagDraw',
+                namespace=LaunchConfig('camera'),
+                parameters=[{'image_transport': trans, 'max_queue_size': 200}],
+                remappings=[(img_src, img_trg), ('tags', LaunchConfig('tags'))],
                 extra_arguments=[{'use_intra_process_comms': True}],
             ),
         ],
         output='screen',
-    )  # end of container
+    )
     return [container]
 
 
 def generate_launch_description():
-    return LaunchDescription(
+    """Create composable node by calling opaque function."""
+    return launch.LaunchDescription(
         [
             LaunchArg(
-                'camera',
-                default_value='/cam_sync/cam0',
-                description='name of camera (e.g. /cam_sync/cam0)',
+                'black_border_width',
+                default_value=['1'],
+                description='width of black border (MIT only)',
+            ),
+            LaunchArg('blur', default_value=['0.0'], description='gaussian blur'),
+            LaunchArg('camera', default_value=['/cam_sync/cam0'], description='camera name'),
+            LaunchArg('decimate_factor', default_value=['1.0'], description='decimation factor'),
+            LaunchArg(
+                'image',
+                default_value=['image_raw'],
+                description="image topic name, e.g. 'image_raw'",
+            ),
+            LaunchArg(
+                'image_transport', default_value=['raw'], description='input image transport'
+            ),
+            LaunchArg(
+                'max_allowed_hamming_distance',
+                default_value=['0'],
+                description='maximum allowed hamming distance',
+            ),
+            LaunchArg('tags', default_value=['tags'], description="tag topic name, e.g. 'tags'"),
+            LaunchArg('num_threads', default_value=['1'], description='number of threads to use'),
+            LaunchArg('tag_family', default_value=['tf36h11'], description='tag family'),
+            LaunchArg(
+                'type', default_value=['mit'], description='type of detector (umich, mit)'
             ),
             OpaqueFunction(function=launch_setup),
         ]
